@@ -1,0 +1,11 @@
+# ignore encryption key files. 
+*.key
+
+# ignore any enviroment files
+*.env
+
+# ignore any CSV files
+*.CSV
+
+# ignore any vscode files
+*.vscode

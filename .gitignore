@@ -3,3 +3,4 @@ tokenFile.env
 __pycache__/CanvasScriptsGUI.cpython-38.pyc
 __pycache__/PageViews.cpython-38.pyc
 __pycache__/*
+*.csv

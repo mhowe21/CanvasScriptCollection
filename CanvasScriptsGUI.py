@@ -9,6 +9,7 @@ except ModuleNotFoundError:
         [sys.executable, "-m", "pip", "install", "cryptography"])
     from cryptography.fernet import Fernet
 # import scripts
+import FailedReports
 import PageViews
 
 
@@ -89,20 +90,21 @@ class MainGUI():
 
     # GUI options on select
     def _listSelect(self, event=None):
+        """Select an item from the list
+        Then show its options"""
         selection = self.scriptList.curselection()
         selection = selection[0]
-        print(selection)
+        # print(selection)
         if selection == 0:
             self.pageViewsOptions()
+        elif selection == 1:
+            self.failedReportsOptions()
 
     def pageViewsOptions(self):
         # reset selection
         self.optionsFrame.destroy()
         self.GUI_options()
 
-        # draw options and then update root element
-        # B = ttk.Button(self.optionsFrame, text="testButton", command=None)
-        # B.grid()
         domainEntryLabel = ttk.Label(
             self.optionsFrame, text="""Enter Instance domain
             (e.g canvas.instructure.com)""")
@@ -115,7 +117,7 @@ class MainGUI():
         Leave blank for all""")
         self.startDateEntry = Entry(self.optionsFrame)
         endDateEntryLabel = ttk.Label(self.optionsFrame,
-                                      text="""Enter End Date format yyyy-mm-dd 
+                                      text="""Enter End Date format yyyy-mm-dd
         Leave blank for all""")
         self.endDateEntry = Entry(self.optionsFrame)
 
@@ -123,8 +125,10 @@ class MainGUI():
         tokenString = self.crypter.decrypt("tokenFile.env", key).decode()
 
         PV = PageViews.inputAndRun()
-        runButton = ttk.Button(self.optionsFrame, text="Run", command=lambda: [PV.inputs(tokenString, self.domainEntry.get(
-        ), self.userIDEntry.get(), Start_Date=self.startDateEntry.get(), End_Date=self.endDateEntry.get()), PV.run()])
+        runButton = ttk.Button(self.optionsFrame, text="Run", command=lambda:
+                               [PV.inputs(tokenString, self.domainEntry.get
+                                          (
+                                          ), self.userIDEntry.get(), Start_Date=self.startDateEntry.get(), End_Date=self.endDateEntry.get()), PV.run()])
 
         domainEntryLabel.grid()
         self.domainEntry.grid()
@@ -137,6 +141,34 @@ class MainGUI():
         runButton.grid()
 
         self.root.update()
+
+    def failedReportsOptions(self):
+        self.optionsFrame.destroy()
+        self.GUI_options()
+        self.SelectedOption = StringVar()
+
+        domainEntryLabel = ttk.Label(self.optionsFrame, text="""Enter Instance Domain
+        e.g canvas.instructure.com)""")
+        domainEntry = self.domainEntry = Entry(self.optionsFrame)
+
+        RadiobuttonLabel = ttk.Label(
+            self.optionsFrame, text="""Scan All sub accounts.""")
+        R1 = ttk.Radiobutton(self.optionsFrame, text="Yes",
+                             value=True, var=self.SelectedOption)
+        R2 = ttk.Radiobutton(self.optionsFrame, text="No",
+                             value=False, var=self.SelectedOption)
+
+        key = self.crypter.load_key()
+        tokenString = self.crypter.decrypt("tokenFile.env", key).decode()
+        runButton = ttk.Button(self.optionsFrame, text="Run", command=lambda: FailedReports.inputAndRun(
+            tokenString, domainEntry.get(), self.SelectedOption))
+
+        domainEntryLabel.grid()
+        domainEntry.grid()
+        RadiobuttonLabel.grid()
+        R1.grid()
+        R2.grid()
+        runButton.grid()
 
     def GUI_Menu(self):
         menubar = Menu(self.root)
@@ -165,7 +197,7 @@ class MainGUI():
         self.scriptList.grid(row=1, column=0)
 
         # right center options for selected script
-        # This will need to be extensable
+
     def GUI_options(self):
         self.optionsFrame = Frame(self.root)
         self.optionsFrame.grid(row=1, column=1, stick="nsew", padx=10, pady=10)
@@ -183,15 +215,3 @@ class MainGUI():
 
     def RUN_GUI(self):
         self.root.mainloop()
-
-
-# def main():
-#     UI = MainGUI()
-#     UI.GUI_Menu()
-#     UI.GUI_options()
-#     UI.GUI_output()
-#     UI.RUN_GUI()
-
-
-# if __name__ == "__main__":
-#     main()
